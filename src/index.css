@@ -1,0 +1,22 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  @font-face {
+    font-family: 'FM-Emanee';
+    src: url('./accests/FM-Emanee-ov9nk3.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+  }
+
+  body {
+    @apply antialiased text-gray-900;
+  }
+}
+
+@layer utilities {
+  .font-emanee {
+    font-family: 'FM-Emanee', 'Noto Sans Sinhala', 'Abhaya Libre', sans-serif;
+  }
+}
