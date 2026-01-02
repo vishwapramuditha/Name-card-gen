@@ -1,7 +1,10 @@
 import React, { useState, useRef } from 'react';
 import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
-import { Download, Loader2 } from 'lucide-react';
+import { Document, Packer, Paragraph, ImageRun } from 'docx';
+import JSZip from 'jszip';
+import { saveAs } from 'file-saver';
+import { Download, Loader2, FileImage, FileText } from 'lucide-react';
 import InputForm from './components/InputForm';
 import CardPreview from './components/CardPreview';
 
@@ -20,6 +23,10 @@ function App() {
         fontSizes: { family: 1.2, name: 1.5, subject: 2.5, grade: 1.2, phone: 1.0, school: 1.0 },
         optimizeEnglish: true,
         familyLanguage: 'sinhala',
+        nameLanguage: 'sinhala',
+        gradeLanguage: 'sinhala',
+        schoolLanguage: 'sinhala',
+        textAlign: { subject: 'center', grade: 'center', school: 'center' },
         autoScale: true
     });
     const [isGenerating, setIsGenerating] = useState(false);
@@ -32,7 +39,15 @@ function App() {
 
         data.subjects.forEach(subj => {
             for (let i = 0; i < subj.count; i++) {
-                cards.push({ ...data, subject: subj.name, uniqueId: `${subj.id}-${i}` });
+                for (let i = 0; i < subj.count; i++) {
+                    cards.push({
+                        ...data,
+                        ...subj, // Apply snapshot details (studentName, grade, etc.)
+                        subject: subj.name, // Ensure subject name is correct
+                        language: subj.language || data.language || 'sinhala', // prefer subject snapshot lang, then global
+                        uniqueId: `${subj.id}-${i}`
+                    });
+                }
             }
         });
         return cards;
@@ -59,18 +74,103 @@ function App() {
 
         for (let i = 0; i < pageElements.length; i++) {
             const canvas = await html2canvas(pageElements[i], {
-                scale: 2, // Higher scale for better quality
+                scale: 3, // High resolution for print (approx 300dpi)
                 useCORS: true,
                 backgroundColor: '#ffffff'
             });
-            const imgData = canvas.toDataURL('image/png');
+            // Use JPEG with 0.85 quality to balance size and clarity (PNG is too huge)
+            const imgData = canvas.toDataURL('image/jpeg', 0.85);
 
             if (i > 0) pdf.addPage();
             // Adjust width/height to fit A4 exactly
-            pdf.addImage(imgData, 'PNG', 0, 0, pageWidth, pageHeight);
+            pdf.addImage(imgData, 'JPEG', 0, 0, pageWidth, pageHeight);
         }
 
         pdf.save(`${data.studentName || 'School'}_Name_Cards.pdf`);
+        setIsGenerating(false);
+    };
+
+    const handleDownloadWord = async () => {
+        const cards = getAllCards();
+        if (cards.length === 0) {
+            alert("Please add at least one subject.");
+            return;
+        }
+        setIsGenerating(true);
+        await new Promise(resolve => setTimeout(resolve, 100));
+
+        const pageElements = printRef.current.querySelectorAll('.print-page');
+        const children = [];
+
+        for (let i = 0; i < pageElements.length; i++) {
+            const canvas = await html2canvas(pageElements[i], {
+                scale: 2,
+                useCORS: true,
+                backgroundColor: '#ffffff'
+            });
+            const imgData = canvas.toDataURL('image/jpeg', 0.85);
+
+            const imageRun = new ImageRun({
+                data: imgData,
+                transformation: {
+                    width: 794,
+                    height: 1123,
+                },
+            });
+
+            children.push(new Paragraph({
+                children: [imageRun],
+            }));
+        }
+
+        const doc = new Document({
+            sections: [{
+                properties: {},
+                children: children,
+            }],
+        });
+
+        const blob = await Packer.toBlob(doc);
+        saveAs(blob, `${data.studentName || 'School'}_Name_Cards.docx`);
+        setIsGenerating(false);
+    };
+
+    const handleDownloadImages = async () => {
+        const cards = getAllCards();
+        if (cards.length === 0) {
+            alert("Please add at least one subject.");
+            return;
+        }
+        setIsGenerating(true);
+        await new Promise(resolve => setTimeout(resolve, 100));
+
+        const cardElements = printRef.current.querySelectorAll('.print-card-item > div');
+        const zip = new JSZip();
+
+        const usedNames = new Set();
+
+        for (let i = 0; i < cardElements.length; i++) {
+            const canvas = await html2canvas(cardElements[i], {
+                scale: 3,
+                useCORS: true,
+                backgroundColor: '#ffffff'
+            });
+
+            const subject = cards[i]?.subject || `card_${i + 1}`;
+            let filename = `${subject}.png`;
+            let counter = 1;
+            while (usedNames.has(filename)) {
+                filename = `${subject}_${counter}.png`;
+                counter++;
+            }
+            usedNames.add(filename);
+
+            const imgData = canvas.toDataURL('image/png').split(',')[1];
+            zip.file(filename, imgData, { base64: true });
+        }
+
+        const content = await zip.generateAsync({ type: "blob" });
+        saveAs(content, `${data.studentName || 'School'}_Cards_Images.zip`);
         setIsGenerating(false);
     };
 
@@ -104,16 +204,40 @@ function App() {
                             <InputForm data={data} onUpdate={setData} />
                         </div>
 
+                        <div className="grid grid-cols-2 gap-2">
+                            <button
+                                onClick={handleDownloadPdf}
+                                disabled={isGenerating || allCards.length === 0}
+                                className={`w-full py-3 rounded-xl flex items-center justify-center gap-2 font-bold text-base transition-all shadow
+                                ${isGenerating || allCards.length === 0
+                                        ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                                        : 'bg-red-600 text-white hover:bg-red-700'}`}
+                            >
+                                {isGenerating ? <Loader2 size={18} className="animate-spin" /> : <Download size={18} />}
+                                PDF
+                            </button>
+                            <button
+                                onClick={handleDownloadWord}
+                                disabled={isGenerating || allCards.length === 0}
+                                className={`w-full py-3 rounded-xl flex items-center justify-center gap-2 font-bold text-base transition-all shadow
+                                ${isGenerating || allCards.length === 0
+                                        ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                                        : 'bg-blue-700 text-white hover:bg-blue-800'}`}
+                            >
+                                {isGenerating ? <Loader2 size={18} className="animate-spin" /> : <FileText size={18} />}
+                                Word
+                            </button>
+                        </div>
                         <button
-                            onClick={handleDownloadPdf}
+                            onClick={handleDownloadImages}
                             disabled={isGenerating || allCards.length === 0}
-                            className={`w-full py-4 rounded-xl flex items-center justify-center gap-2 font-bold text-lg transition-all shadow-md
-                  ${isGenerating || allCards.length === 0
+                            className={`w-full py-3 rounded-xl flex items-center justify-center gap-2 font-bold text-base transition-all shadow
+                            ${isGenerating || allCards.length === 0
                                     ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                                    : 'bg-blue-600 text-white hover:bg-blue-700 hover:shadow-lg hover:-translate-y-0.5'}`}
+                                    : 'bg-green-600 text-white hover:bg-green-700'}`}
                         >
-                            {isGenerating ? <Loader2 className="animate-spin" /> : <Download />}
-                            {isGenerating ? 'Generating PDF...' : 'Download PDF'}
+                            {isGenerating ? <Loader2 size={18} className="animate-spin" /> : <FileImage size={18} />}
+                            Download Images (ZIP)
                         </button>
 
                         <div className="text-center text-sm text-gray-500">
@@ -144,6 +268,8 @@ function App() {
                                         optimizeEnglish={data.optimizeEnglish}
                                         template={data.template}
                                         colorMode={data.colorMode}
+                                        subjectLanguage={data.subjects.length > 0 ? (data.subjects[0].language || 'sinhala') : 'sinhala'}
+                                        textAlign={data.textAlign}
                                         scale={1.2}
                                     />
                                 </div>
@@ -188,6 +314,8 @@ function App() {
                                         optimizeEnglish={card.optimizeEnglish}
                                         template={card.template}
                                         colorMode={card.colorMode}
+                                        subjectLanguage={card.language || 'sinhala'}
+                                        textAlign={card.textAlign}
                                         scale={1.0} // exact size for print
                                     />
                                 </div>

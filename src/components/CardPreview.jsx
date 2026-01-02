@@ -24,6 +24,11 @@ const CardPreview = ({
     fontSizes = { family: 1.2, name: 1.5, subject: 2.5, details: 1.0 },
     optimizeEnglish = true,
     autoScale = true,
+    subjectLanguage = 'sinhala',
+    nameLanguage = 'sinhala',
+    gradeLanguage = 'sinhala',
+    schoolLanguage = 'sinhala',
+    textAlign = { subject: 'center', grade: 'center', school: 'center' },
     scale = 1
 }) => {
     const isBw = colorMode === 'bw';
@@ -45,8 +50,11 @@ const CardPreview = ({
     /**
      * Helper to render text with mixed fonts.
      */
-    const renderMixedText = (text) => {
+    const renderMixedText = (text, specificLang) => {
         if (!text) return null;
+        if (specificLang === 'english') {
+            return <span style={{ fontFamily: '"Abhaya Libre", "Times New Roman", serif' }}>{text}</span>;
+        }
         if (!optimizeEnglish) return text;
 
         const parts = text.split(/([A-Za-z0-9\.\-\_\(\)\s]+)/g);
@@ -131,13 +139,22 @@ const CardPreview = ({
     };
 
     // Render Subject
-    const renderSubjectContent = (color = 'black', isBold = true) => {
+    const renderSubjectContent = (color = 'black', isBold = true, subjectLanguage = 'sinhala') => {
         if (!subject || subject.trim() === '') return <div className="h-6"></div>; // Reduced height placeholder
         const fontSize = getSmartSize(subject, 'subject');
+
+        const align = textAlign?.subject || 'center';
+        const alignClass = align === 'left' ? 'text-left' : (align === 'right' ? 'text-right' : 'text-center');
+
+        // Apply font based on subject language preference
+        const subjectText = subjectLanguage === 'english'
+            ? <span style={{ fontFamily: '"Abhaya Libre", "Times New Roman", serif' }}>{subject}</span>
+            : renderMixedText(subject);
+
         return (
-            <span className={`${isBold ? 'font-black' : 'font-bold'} leading-none text-center break-words w-full inline-block`}
-                style={{ fontSize, color, lineHeight: '1.0' }}>
-                {renderMixedText(subject)}
+            <span className={`${isBold ? 'font-black' : 'font-bold'} leading-none break-words w-full inline-block px-1`}
+                style={{ fontSize, color, lineHeight: '1.0', textAlign: align }}>
+                {subjectText}
             </span>
         );
     };
@@ -145,29 +162,30 @@ const CardPreview = ({
     // Helper for Details (Grade + Phone)
     const renderDetailsGroup = (color = 'black') => {
         const baseGradeSize = getSmartSize(grade, 'details');
-        // Make grade slightly larger (1.1x)
         const gradeSize = parseFloat(baseGradeSize) * 1.1 + 'em';
-
         const phoneSize = getSmartSize(phone, 'details');
         const phoneSizeVal = parseFloat(phoneSize) * 0.85 + 'em';
 
-        // Auto-fill Grade Label
-        // If language is 'sinhala', we use the encoded string "fYa%Ksh" forced to FM-Emanee
-        // If 'english' or 'both', we use "Grade" in standard font.
-        const gradePrefix = language === 'sinhala'
+        const align = textAlign?.grade || 'center';
+        const flexAlign = align === 'left' ? 'items-start' : (align === 'right' ? 'items-end' : 'items-center');
+        const textAlignClass = align === 'left' ? 'text-left' : (align === 'right' ? 'text-right' : 'text-center');
+
+        const gradePrefix = gradeLanguage === 'sinhala'
             ? <span style={{ fontFamily: '"FM-Emanee", sans-serif' }}>fYa%Ksh </span>
             : <span style={{ fontFamily: '"Abhaya Libre", "Times New Roman", serif' }}>Grade </span>;
 
+        const alignItems = align === 'left' ? 'flex-start' : (align === 'right' ? 'flex-end' : 'center');
+
         return (
-            <div className="flex flex-col items-center justify-center w-full font-bold">
+            <div className={`flex flex-col justify-center w-full font-bold px-1`} style={{ alignItems }}>
                 {grade && (
-                    <div className="leading-tight mb-1" style={{ fontSize: gradeSize, color }}> {/* Added gap mb-1 */}
+                    <div className="leading-tight mb-1" style={{ fontSize: gradeSize, color, textAlign: align }}>
                         {gradePrefix}
-                        {renderMixedText(grade)}
+                        {renderMixedText(grade, gradeLanguage)}
                     </div>
                 )}
                 {phone && (
-                    <div className="leading-tight text-opacity-80" style={{ fontSize: phoneSizeVal, color }}>
+                    <div className="leading-tight text-opacity-80" style={{ fontSize: phoneSizeVal, color, textAlign: align }}>
                         {renderMixedText(phone)}
                     </div>
                 )}
@@ -179,10 +197,17 @@ const CardPreview = ({
     const renderSchool = (color = 'black') => {
         if (!school) return null;
         const fontSize = getSmartSize(school, 'details');
+
+        const align = textAlign?.school || 'center';
+        const alignClass = align === 'left' ? 'text-left' : (align === 'right' ? 'text-right' : 'text-center');
+
         return (
-            <div className="w-full text-center overflow-hidden whitespace-nowrap text-ellipsis px-1 font-bold leading-tight"
-                style={{ fontSize, color }}>
-                {renderMixedText(school)}
+            <div className={`w-full overflow-hidden whitespace-nowrap text-ellipsis px-1 font-bold leading-relaxed pb-1 pt-0.5`}
+                style={{ fontSize, color, textAlign: align }}>
+                {schoolLanguage === 'english' ?
+                    <span style={{ fontFamily: '"Abhaya Libre", "Times New Roman", serif' }}>{school}</span> :
+                    renderMixedText(school)
+                }
             </div>
         );
     };
@@ -204,7 +229,10 @@ const CardPreview = ({
                     </>
                 )}
                 <span className="font-bold break-words" style={{ fontSize: nameSizeVal, color }}>
-                    {renderMixedText(studentName)}
+                    {nameLanguage === 'english' ?
+                        <span style={{ fontFamily: '"Abhaya Libre", "Times New Roman", serif' }}>{studentName}</span> :
+                        renderMixedText(studentName)
+                    }
                 </span>
             </div>
         );
@@ -231,7 +259,7 @@ const CardPreview = ({
                     </div>
 
                     <div className="flex-1 flex flex-col justify-center items-center w-full">
-                        {renderSubjectContent('black')}
+                        {renderSubjectContent('black', true, subjectLanguage)}
                         <div className="mt-2 text-center">
                             {renderDetailsGroup('black')}
                         </div>
@@ -273,7 +301,7 @@ const CardPreview = ({
 
                         <div className="flex-1 flex flex-row items-center w-full mt-1">
                             <div className="flex-1 flex flex-col items-center">
-                                {renderSubjectContent(isBw ? 'black' : theme.text)}
+                                {renderSubjectContent(isBw ? 'black' : theme.text, true, subjectLanguage)}
                                 <div className="mt-2">{renderDetailsGroup('black')}</div>
                             </div>
                             {image && (
@@ -313,7 +341,7 @@ const CardPreview = ({
                     <div className="flex-1 flex flex-row items-center">
                         <div className="flex-1 flex flex-col items-center justify-center bg-yellow-50 border-2 border-black rounded-full p-4 h-[120px] w-[120px] shadow-[3px_3px_0px_#000] mx-auto relative overflow-visible">
                             <div className="absolute -top-3 bg-white border border-black px-2 text-xs font-bold -rotate-6">SUBJECT</div>
-                            {renderSubjectContent('black')}
+                            {renderSubjectContent('black', true, subjectLanguage)}
                             <div className="absolute -bottom-4 bg-white border border-black px-2 py-1 rounded shadow-[2px_2px_0px_#000] text-xs w-max max-w-[150%] z-20">
                                 {renderDetailsGroup('black')}
                             </div>
@@ -352,7 +380,7 @@ const CardPreview = ({
 
                         {/* Middle: Subject + Details Group */}
                         <div className="flex-1 flex flex-col justify-center items-center w-full px-2 -my-2">{/* Negative vertical margin to pull content together */}
-                            {renderSubjectContent('black')}
+                            {renderSubjectContent('black', true, subjectLanguage)}
                             <div className="mt-0.5">{renderDetailsGroup('black')}</div>
                         </div>
 
@@ -396,7 +424,7 @@ const CardPreview = ({
                     </div>
 
                     <div className="my-0.5 w-full border-t border-b border-[#8d6e63] py-1 bg-white/50 flex-1 flex flex-col justify-center items-center">
-                        {renderSubjectContent('#3e2723')}
+                        {renderSubjectContent('#3e2723', true, subjectLanguage)}
                         <div className="mt-0.5">{renderDetailsGroup('#5d4037')}</div>
                     </div>
 
@@ -441,7 +469,7 @@ const CardPreview = ({
                         </div>
 
                         <div className="flex-1 flex flex-col justify-center items-center w-full my-auto">
-                            {renderSubjectContent('black')}
+                            {renderSubjectContent('black', true, subjectLanguage)}
                             <div className="mt-0.5 w-full">{renderDetailsGroup('black')}</div>
                         </div>
 
@@ -494,7 +522,7 @@ const CardPreview = ({
 
                     <div className="py-1 text-center w-full relative flex-1 flex flex-col justify-center">
                         {image && <div className="absolute inset-0 flex items-center justify-center opacity-10 pointer-events-none"><img src={image} className="h-full object-contain grayscale" /></div>}
-                        {renderSubjectContent('black')}
+                        {renderSubjectContent('black', true, subjectLanguage)}
                         <div className="mt-1">{renderDetailsGroup('black')}</div>
                     </div>
 
@@ -536,7 +564,7 @@ const CardPreview = ({
                         </div>
 
                         <div className="text-center w-full flex-1 flex flex-col justify-center">
-                            {renderSubjectContent(isBw ? '#000' : theme.text)}
+                            {renderSubjectContent(isBw ? '#000' : theme.text, true, subjectLanguage)}
                             <div className="mt-1">{renderDetailsGroup('gray')}</div>
                         </div>
 
@@ -572,7 +600,7 @@ const CardPreview = ({
 
                     <div className="flex-1 min-h-0 flex flex-row items-center justify-between relative w-full overflow-hidden">
                         <div className="text-left w-[60%] flex flex-col justify-center h-full">
-                            {renderSubjectContent(isBw ? 'black' : '#0284c7')}
+                            {renderSubjectContent(isBw ? 'black' : '#0284c7', true, subjectLanguage)}
                             <div className="mt-1 text-left w-full pl-2">
                                 {renderDetailsGroup('gray')}
                             </div>
@@ -609,7 +637,7 @@ const CardPreview = ({
                     </div>
 
                     <div className="my-1 w-full relative z-10 flex flex-col items-start justify-center">
-                        {renderSubjectContent(isBw ? '#000' : theme.text)}
+                        {renderSubjectContent(isBw ? '#000' : theme.text, true, subjectLanguage)}
                         {/* Grade and Phone grouped under subject */}
                         <div className="mt-1 pl-1 w-full text-left">
                             {grade && <div className="font-bold text-gray-700" style={{ fontSize: `${fontSizes.grade}em` }}>{renderMixedText(grade)}</div>}
@@ -624,8 +652,8 @@ const CardPreview = ({
                     </div>
                 </div>
 
-                <div className="w-[100px] bg-gray-50 flex items-center justify-center p-0 overflow-hidden relative" style={{ backgroundColor: isBw ? '#f9f9f9' : theme.bg }}>
-                    {image && <img src={image} className="w-full h-full object-cover opacity-90" />}
+                <div className="w-[100px] bg-gray-50 flex items-center justify-center p-1 overflow-hidden relative" style={{ backgroundColor: isBw ? '#f9f9f9' : theme.bg }}>
+                    {image && <img src={image} className="w-full h-full object-contain" />}
                 </div>
             </div>
         </div>
