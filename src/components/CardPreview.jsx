@@ -14,6 +14,7 @@ const CardPreview = ({
     familyName = "",
     familyLanguage = "sinhala",
     grade = "",
+    gradeLetter = "",
     school = "",
     subject = "",
     image = null,
@@ -133,6 +134,9 @@ const CardPreview = ({
         const align = textAlign?.subject || 'center';
         const alignClass = align === 'left' ? 'text-left' : (align === 'right' ? 'text-right' : 'text-center');
 
+        // Custom Color Logic
+        const finalColor = (!isBw && safeTextStyles.subject?.color) ? safeTextStyles.subject.color : color;
+
         // Apply font based on subject language preference
         const subjectText = subjectLanguage === 'english'
             ? <span style={{ fontFamily: '"Abhaya Libre", "Times New Roman", serif' }}>{subject}</span>
@@ -142,7 +146,7 @@ const CardPreview = ({
             <span className={`leading-none break-words w-full inline-block px-1`}
                 style={{
                     fontSize,
-                    color,
+                    color: finalColor,
                     lineHeight: '1.0',
                     textAlign: align,
                     fontWeight: safeTextStyles.subject?.bold ? 'bold' : 'normal',
@@ -168,11 +172,15 @@ const CardPreview = ({
 
         const alignItems = align === 'left' ? 'flex-start' : (align === 'right' ? 'flex-end' : 'center');
 
+        // Custom Colors
+        const gradeColor = (!isBw && safeTextStyles.grade?.color) ? safeTextStyles.grade.color : color;
+        const phoneColor = (!isBw && safeTextStyles.phone?.color) ? safeTextStyles.phone.color : color;
+
         return (
             <div className={`flex flex-col justify-center w-full font-bold px-1`} style={{ alignItems }}>
                 {grade && (
                     <div className="leading-tight mb-1" style={{
-                        fontSize: gradeSize, color, textAlign: align,
+                        fontSize: gradeSize, color: gradeColor, textAlign: align,
                         fontWeight: safeTextStyles.grade?.bold ? 'bold' : 'normal',
                         fontStyle: safeTextStyles.grade?.italic ? 'italic' : 'normal'
                     }}>
@@ -180,10 +188,11 @@ const CardPreview = ({
                             <span style={{ fontFamily: '"Abhaya Libre", "Times New Roman", serif' }}>{grade}</span> :
                             (gradeLanguage === 'sinhala' ? <span style={{ fontFamily: '"FM-Emanee", sans-serif' }}>{grade}</span> : renderMixedText(grade, gradeLanguage))
                         }
+                        {gradeLetter && <span className="ml-1" style={{ fontFamily: '"Abhaya Libre", "Times New Roman", serif' }}>{gradeLetter}</span>}
                     </div>
                 )}
                 {phone && (
-                    <div className="leading-tight text-opacity-80" style={{ fontSize: phoneSizeVal, color, textAlign: align }}>
+                    <div className="leading-tight text-opacity-80" style={{ fontSize: phoneSizeVal, color: phoneColor, textAlign: align }}>
                         {renderMixedText(phone)}
                     </div>
                 )}
@@ -199,9 +208,12 @@ const CardPreview = ({
         const align = textAlign?.school || 'center';
         const alignClass = align === 'left' ? 'text-left' : (align === 'right' ? 'text-right' : 'text-center');
 
+        // Custom Color
+        const finalColor = (!isBw && safeTextStyles.school?.color) ? safeTextStyles.school.color : color;
+
         return (
             <div className={alignClass} style={{
-                fontSize, color,
+                fontSize, color: finalColor,
                 fontWeight: safeTextStyles.school?.bold ? 'bold' : 'normal',
                 fontStyle: safeTextStyles.school?.italic ? 'italic' : 'normal'
             }}>
@@ -220,10 +232,14 @@ const CardPreview = ({
         // Calculate optimized size for student name
         const nameSizeVal = getSmartSize(studentName, 'name');
 
+        // Custom Colors
+        const familyColor = (!isBw && safeTextStyles.family?.color) ? safeTextStyles.family.color : color;
+        const nameColor = (!isBw && safeTextStyles.name?.color) ? safeTextStyles.name.color : color;
+
         return (
             <div className="w-full text-center px-1 leading-tight pb-0">
                 {familyName && <div className="leading-none mb-0.5" style={{
-                    fontSize: familySizeVal, color, marginTop: '2px',
+                    fontSize: familySizeVal, color: familyColor, marginTop: '2px',
                     fontWeight: safeTextStyles.family?.bold ? 'bold' : 'normal',
                     fontStyle: safeTextStyles.family?.italic ? 'italic' : 'normal'
                 }}>
@@ -233,7 +249,7 @@ const CardPreview = ({
                     }
                 </div>}
                 <span className="break-words" style={{
-                    fontSize: nameSizeVal, color,
+                    fontSize: nameSizeVal, color: nameColor,
                     fontWeight: safeTextStyles.name?.bold ? 'bold' : 'bold', // Default name is bold usually
                     fontStyle: safeTextStyles.name?.italic ? 'italic' : 'normal'
                 }}>

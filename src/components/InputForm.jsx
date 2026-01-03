@@ -31,6 +31,7 @@ const InputForm = ({ onUpdate, data }) => {
             studentName: data.studentName,
             familyName: data.familyName,
             grade: data.grade,
+            gradeLetter: data.gradeLetter,
             school: data.school,
             phone: data.phone,
             language: data.language,
@@ -233,42 +234,59 @@ const InputForm = ({ onUpdate, data }) => {
                 </div>
             </div>
 
-            {/* Text Styling Panel */}
+            {/* Text Styling & Colors Panel */}
             <div className="bg-white p-4 rounded-lg border border-gray-200">
-                <h3 className="text-sm font-medium text-gray-700 mb-3">Text Styling</h3>
-                <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
-                    {['name', 'family', 'subject', 'grade', 'school'].map((field) => (
-                        <div key={field} className="flex flex-col">
-                            <span className="text-xs text-gray-500 mb-1 capitalize">{field}</span>
-                            <div className="flex bg-gray-100 rounded p-1 border border-gray-200 gap-1 justify-center">
-                                <button
-                                    type="button"
-                                    onClick={() => onUpdate({
-                                        ...data,
-                                        textStyles: {
-                                            ...data.textStyles,
-                                            [field]: { ...(data.textStyles?.[field] || {}), bold: !data.textStyles?.[field]?.bold }
-                                        }
-                                    })}
-                                    className={`p-1.5 rounded transition-colors ${data.textStyles?.[field]?.bold ? 'bg-white text-black shadow font-bold' : 'text-gray-400 hover:text-gray-600'}`}
-                                    title="Bold"
-                                >
-                                    B
-                                </button>
-                                <button
-                                    type="button"
-                                    onClick={() => onUpdate({
-                                        ...data,
-                                        textStyles: {
-                                            ...data.textStyles,
-                                            [field]: { ...(data.textStyles?.[field] || {}), italic: !data.textStyles?.[field]?.italic }
-                                        }
-                                    })}
-                                    className={`p-1.5 rounded transition-colors ${data.textStyles?.[field]?.italic ? 'bg-white text-black shadow italic' : 'text-gray-400 hover:text-gray-600'}`}
-                                    title="Italic"
-                                >
-                                    I
-                                </button>
+                <h3 className="text-sm font-medium text-gray-700 mb-3">Text Styling & Colors</h3>
+                <div className="grid grid-cols-1 gap-3">
+                    {['name', 'family', 'subject', 'grade', 'school', 'phone'].map((field) => (
+                        <div key={field} className="flex items-center justify-between bg-gray-50 p-2 rounded border border-gray-100">
+                            <span className="text-sm text-gray-600 capitalize font-medium w-20">{field}</span>
+                            <div className="flex items-center gap-3">
+                                <div className="flex bg-white rounded p-1 border border-gray-200 gap-1">
+                                    <button
+                                        type="button"
+                                        onClick={() => onUpdate({
+                                            ...data,
+                                            textStyles: {
+                                                ...data.textStyles,
+                                                [field]: { ...(data.textStyles?.[field] || {}), bold: !data.textStyles?.[field]?.bold }
+                                            }
+                                        })}
+                                        className={`w-8 h-8 flex items-center justify-center rounded transition-colors ${data.textStyles?.[field]?.bold ? 'bg-gray-800 text-white font-bold' : 'text-gray-400 hover:bg-gray-100'}`}
+                                        title="Bold"
+                                    >
+                                        B
+                                    </button>
+                                    <button
+                                        type="button"
+                                        onClick={() => onUpdate({
+                                            ...data,
+                                            textStyles: {
+                                                ...data.textStyles,
+                                                [field]: { ...(data.textStyles?.[field] || {}), italic: !data.textStyles?.[field]?.italic }
+                                            }
+                                        })}
+                                        className={`w-8 h-8 flex items-center justify-center rounded transition-colors ${data.textStyles?.[field]?.italic ? 'bg-gray-800 text-white italic' : 'text-gray-400 hover:bg-gray-100'}`}
+                                        title="Italic"
+                                    >
+                                        I
+                                    </button>
+                                </div>
+                                <div className="flex items-center gap-2 border-l pl-3 border-gray-200">
+                                    <input
+                                        type="color"
+                                        value={data.textStyles?.[field]?.color || '#000000'}
+                                        onChange={(e) => onUpdate({
+                                            ...data,
+                                            textStyles: {
+                                                ...data.textStyles,
+                                                [field]: { ...(data.textStyles?.[field] || {}), color: e.target.value }
+                                            }
+                                        })}
+                                        className="w-8 h-8 p-0 rounded cursor-pointer border-0"
+                                        title="Text Color"
+                                    />
+                                </div>
                             </div>
                         </div>
                     ))}
@@ -281,26 +299,42 @@ const InputForm = ({ onUpdate, data }) => {
                     Batch Settings (Fixed)
                 </h3>
                 <div className="grid grid-cols-2 gap-4">
+
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">Grade</label>
-                        <input
-                            type="text"
-                            name="grade"
-                            value={data.grade || ''}
-                            onChange={handleInputChange}
-                            placeholder="e.g. Grade 2"
-                            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 font-sinhala"
-                        />
-                        <div className="flex justify-end mt-1">
-                            <div className="flex bg-gray-100 p-0.5 rounded text-xs">
-                                <button
-                                    onClick={() => onUpdate({ ...data, gradeLanguage: 'sinhala' })}
-                                    className={`px-2 py-0.5 rounded ${data.gradeLanguage === 'sinhala' ? 'bg-white shadow text-blue-600' : 'text-gray-500 hover:text-gray-700'}`}
-                                >Sinhala</button>
-                                <button
-                                    onClick={() => onUpdate({ ...data, gradeLanguage: 'english' })}
-                                    className={`px-2 py-0.5 rounded ${data.gradeLanguage === 'english' ? 'bg-white shadow text-blue-600' : 'text-gray-500 hover:text-gray-700'}`}
-                                >English</button>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Grade & Suffix</label>
+                        <div className="flex gap-2">
+                            <div className="flex-1">
+                                <input
+                                    type="text"
+                                    name="grade"
+                                    value={data.grade || ''}
+                                    onChange={handleInputChange}
+                                    placeholder="Grade (e.g. 2)"
+                                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 font-sinhala"
+                                />
+                                <div className="flex justify-end mt-1">
+                                    <div className="flex bg-gray-100 p-0.5 rounded text-xs">
+                                        <button
+                                            onClick={() => onUpdate({ ...data, gradeLanguage: 'sinhala' })}
+                                            className={`px-2 py-0.5 rounded ${data.gradeLanguage === 'sinhala' ? 'bg-white shadow text-blue-600' : 'text-gray-500 hover:text-gray-700'}`}
+                                        >Sinhala</button>
+                                        <button
+                                            onClick={() => onUpdate({ ...data, gradeLanguage: 'english' })}
+                                            className={`px-2 py-0.5 rounded ${data.gradeLanguage === 'english' ? 'bg-white shadow text-blue-600' : 'text-gray-500 hover:text-gray-700'}`}
+                                        >English</button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div className="w-1/3">
+                                <input
+                                    type="text"
+                                    name="gradeLetter"
+                                    value={data.gradeLetter || ''}
+                                    onChange={handleInputChange}
+                                    placeholder="Letter"
+                                    className="w-full px-3 py-2 border border-blue-100 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-center font-bold text-gray-700"
+                                    title="English Grade Letter (e.g. A, B)"
+                                />
                             </div>
                         </div>
                     </div>

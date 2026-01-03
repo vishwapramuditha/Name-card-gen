@@ -13,6 +13,7 @@ function App() {
         studentName: '',
         familyName: '',
         grade: '',
+        gradeLetter: '', // English letter suffix
         school: '',
         subjects: [],
         image: null,
@@ -29,12 +30,12 @@ function App() {
         textAlign: { subject: 'center', grade: 'center', school: 'center' },
         autoScale: true,
         textStyles: {
-            name: { bold: false, italic: false },
-            family: { bold: false, italic: false },
-            grade: { bold: false, italic: false },
-            school: { bold: false, italic: false },
-            subject: { bold: false, italic: false },
-            phone: { bold: false, italic: false }
+            name: { bold: false, italic: false, color: '#000000' },
+            family: { bold: false, italic: false, color: '#000000' },
+            grade: { bold: false, italic: false, color: '#000000' },
+            school: { bold: false, italic: false, color: '#000000' },
+            subject: { bold: false, italic: false, color: '#000000' },
+            phone: { bold: false, italic: false, color: '#000000' }
         }
     });
     const [isGenerating, setIsGenerating] = useState(false);
@@ -265,6 +266,7 @@ function App() {
                                         familyName={data.familyName}
                                         familyLanguage={data.familyLanguage}
                                         grade={data.grade}
+                                        gradeLetter={data.gradeLetter}
                                         autoScale={data.autoScale}
                                         school={data.school}
                                         subject={data.subjects.length > 0 ? data.subjects[data.subjects.length - 1].name : ""}
@@ -317,6 +319,7 @@ function App() {
                                         familyName={card.familyName}
                                         familyLanguage={card.familyLanguage}
                                         grade={card.grade}
+                                        gradeLetter={card.gradeLetter}
                                         autoScale={card.autoScale}
                                         school={card.school}
                                         subject={card.subject}
