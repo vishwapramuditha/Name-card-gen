@@ -39,11 +39,14 @@ const InputForm = ({ onUpdate, data }) => {
             gradeLanguage: data.gradeLanguage,
             schoolLanguage: data.schoolLanguage,
             textAlign: data.textAlign,
-            optimizeEnglish: data.optimizeEnglish
+            optimizeEnglish: data.optimizeEnglish,
+            textStyles: data.textStyles || {}, // Snapshot text styles
         };
         onUpdate({
             ...data,
-            subjects: [...(data.subjects || []), item]
+            // Keep the snapshots in subjects
+            subjects: [...(data.subjects || []), item],
+            // We KEEP School, Grade, Phone, Image AND Name persisting for batch entry per user request
         });
         setNewSubject('');
         setQuantity(1);
@@ -230,59 +233,53 @@ const InputForm = ({ onUpdate, data }) => {
                 </div>
             </div>
 
-            {/* Main Details */}
-            <div className="space-y-4">
-                <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Family Name <span className="text-gray-400 font-normal">(Optional)</span></label>
-                    <div className="flex gap-2 mb-2">
-                        <input
-                            type="text"
-                            name="familyName"
-                            value={data.familyName || ''}
-                            onChange={handleInputChange}
-                            placeholder="Family Name"
-                            className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 font-sinhala"
-                        />
-                        <div className="flex bg-gray-100 p-1 rounded-md">
-                            <button
-                                onClick={() => onUpdate({ ...data, familyLanguage: 'sinhala' })}
-                                className={`px-3 py-1 text-xs font-medium rounded ${data.familyLanguage === 'sinhala' ? 'bg-white shadow text-blue-600' : 'text-gray-500 hover:text-gray-700'}`}
-                            >
-                                Sinhala
-                            </button>
-                            <button
-                                onClick={() => onUpdate({ ...data, familyLanguage: 'english' })}
-                                className={`px-3 py-1 text-xs font-medium rounded ${data.familyLanguage === 'english' ? 'bg-white shadow text-blue-600' : 'text-gray-500 hover:text-gray-700'}`}
-                            >
-                                English
-                            </button>
+            {/* Text Styling Panel */}
+            <div className="bg-white p-4 rounded-lg border border-gray-200">
+                <h3 className="text-sm font-medium text-gray-700 mb-3">Text Styling</h3>
+                <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+                    {['name', 'family', 'subject', 'grade', 'school'].map((field) => (
+                        <div key={field} className="flex flex-col">
+                            <span className="text-xs text-gray-500 mb-1 capitalize">{field}</span>
+                            <div className="flex bg-gray-100 rounded p-1 border border-gray-200 gap-1 justify-center">
+                                <button
+                                    type="button"
+                                    onClick={() => onUpdate({
+                                        ...data,
+                                        textStyles: {
+                                            ...data.textStyles,
+                                            [field]: { ...(data.textStyles?.[field] || {}), bold: !data.textStyles?.[field]?.bold }
+                                        }
+                                    })}
+                                    className={`p-1.5 rounded transition-colors ${data.textStyles?.[field]?.bold ? 'bg-white text-black shadow font-bold' : 'text-gray-400 hover:text-gray-600'}`}
+                                    title="Bold"
+                                >
+                                    B
+                                </button>
+                                <button
+                                    type="button"
+                                    onClick={() => onUpdate({
+                                        ...data,
+                                        textStyles: {
+                                            ...data.textStyles,
+                                            [field]: { ...(data.textStyles?.[field] || {}), italic: !data.textStyles?.[field]?.italic }
+                                        }
+                                    })}
+                                    className={`p-1.5 rounded transition-colors ${data.textStyles?.[field]?.italic ? 'bg-white text-black shadow italic' : 'text-gray-400 hover:text-gray-600'}`}
+                                    title="Italic"
+                                >
+                                    I
+                                </button>
+                            </div>
                         </div>
-                    </div>
+                    ))}
                 </div>
-                <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Student Name</label>
-                    <input
-                        type="text"
-                        name="studentName"
-                        value={data.studentName || ''}
-                        onChange={handleInputChange}
-                        placeholder="e.g. D.P.L. Seyansa"
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 font-sinhala"
-                    />
-                    <div className="flex justify-end mt-1">
-                        <div className="flex bg-gray-100 p-0.5 rounded text-xs">
-                            <button
-                                onClick={() => onUpdate({ ...data, nameLanguage: 'sinhala' })}
-                                className={`px-2 py-0.5 rounded ${data.nameLanguage === 'sinhala' ? 'bg-white shadow text-blue-600' : 'text-gray-500 hover:text-gray-700'}`}
-                            >Sinhala</button>
-                            <button
-                                onClick={() => onUpdate({ ...data, nameLanguage: 'english' })}
-                                className={`px-2 py-0.5 rounded ${data.nameLanguage === 'english' ? 'bg-white shadow text-blue-600' : 'text-gray-500 hover:text-gray-700'}`}
-                            >English</button>
-                        </div>
-                    </div>
-                </div>
+            </div>
 
+            <div className="bg-blue-50 p-4 rounded-lg border border-blue-100 mb-6">
+                <h3 className="text-sm font-bold text-blue-800 mb-3 flex items-center">
+                    <span className="bg-blue-200 text-blue-800 rounded-full w-5 h-5 flex items-center justify-center text-xs mr-2">1</span>
+                    Batch Settings (Fixed)
+                </h3>
                 <div className="grid grid-cols-2 gap-4">
                     <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1">Grade</label>
@@ -361,21 +358,103 @@ const InputForm = ({ onUpdate, data }) => {
                 </div>
             </div>
 
+
+            <hr className="border-gray-200" />
+
+            {/* Student Details Section */}
+            <div className="bg-green-50 p-4 rounded-lg border border-green-100">
+                <h3 className="text-sm font-bold text-green-800 mb-3 flex items-center">
+                    <span className="bg-green-200 text-green-800 rounded-full w-5 h-5 flex items-center justify-center text-xs mr-2">2</span>
+                    New Student Card
+                </h3>
+
+                {/* Moved Student Name & Family Name Inputs */}
+                <div className="space-y-4 mb-4">
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Family Name <span className="text-gray-400 font-normal">(Optional)</span></label>
+                        <div className="flex gap-2 mb-2">
+                            <input
+                                type="text"
+                                name="familyName"
+                                value={data.familyName || ''}
+                                onChange={handleInputChange}
+                                placeholder="Family Name"
+                                className="flex-1 px-3 py-2 border border-blue-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 font-sinhala bg-white"
+                            />
+                            <div className="flex bg-white p-1 rounded-md border border-gray-200">
+                                <button
+                                    onClick={() => onUpdate({ ...data, familyLanguage: 'sinhala' })}
+                                    className={`px-3 py-1 text-xs font-medium rounded ${data.familyLanguage === 'sinhala' ? 'bg-blue-50 text-blue-600 font-bold' : 'text-gray-500 hover:text-gray-700'}`}
+                                >
+                                    Sinhala
+                                </button>
+                                <button
+                                    onClick={() => onUpdate({ ...data, familyLanguage: 'english' })}
+                                    className={`px-3 py-1 text-xs font-medium rounded ${data.familyLanguage === 'english' ? 'bg-blue-50 text-blue-600 font-bold' : 'text-gray-500 hover:text-gray-700'}`}
+                                >
+                                    English
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Student Name</label>
+                        <div className="flex flex-col gap-1">
+                            <input
+                                type="text"
+                                name="studentName"
+                                value={data.studentName || ''}
+                                onChange={handleInputChange}
+                                placeholder="e.g. D.P.L. Seyansa"
+                                className="w-full px-3 py-2 border border-blue-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 font-sinhala bg-white"
+                            />
+                            <div className="flex justify-end">
+                                <div className="flex bg-white p-0.5 rounded text-xs border border-gray-200">
+                                    <button
+                                        onClick={() => onUpdate({ ...data, nameLanguage: 'sinhala' })}
+                                        className={`px-2 py-0.5 rounded ${data.nameLanguage === 'sinhala' ? 'bg-blue-50 text-blue-600 font-bold' : 'text-gray-500 hover:text-gray-700'}`}
+                                    >Sinhala</button>
+                                    <button
+                                        onClick={() => onUpdate({ ...data, nameLanguage: 'english' })}
+                                        className={`px-2 py-0.5 rounded ${data.nameLanguage === 'english' ? 'bg-blue-50 text-blue-600 font-bold' : 'text-gray-500 hover:text-gray-700'}`}
+                                    >English</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <hr className="border-gray-200" />
 
             {/* Subject Management */}
             <div>
-                <h3 className="text-md font-semibold text-gray-800 mb-2">Subjects</h3>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Subject</label>
 
                 <div className="flex justify-end mb-1">
-                    <span className="text-xs text-gray-500 mr-2 self-center">Subject Language:</span>
+                    <span className="text-xs text-gray-500 mr-2 self-center">Card Language:</span>
                     <div className="flex bg-gray-100 p-0.5 rounded text-xs">
                         <button
-                            onClick={() => onUpdate({ ...data, language: 'sinhala' })}
+                            onClick={() => onUpdate({
+                                ...data,
+                                language: 'sinhala',
+                                nameLanguage: 'sinhala',
+                                gradeLanguage: 'sinhala',
+                                schoolLanguage: 'sinhala',
+                                familyLanguage: 'english' // User Request: Family name in English for Sinhala cards
+                            })}
                             className={`px-2 py-0.5 rounded ${data.language === 'sinhala' ? 'bg-white shadow text-blue-600' : 'text-gray-500 hover:text-gray-700'}`}
                         >Sinhala</button>
                         <button
-                            onClick={() => onUpdate({ ...data, language: 'english' })}
+                            onClick={() => onUpdate({
+                                ...data,
+                                language: 'english',
+                                nameLanguage: 'english',
+                                gradeLanguage: 'english',
+                                schoolLanguage: 'english',
+                                familyLanguage: 'english'
+                            })}
                             className={`px-2 py-0.5 rounded ${data.language === 'english' ? 'bg-white shadow text-blue-600' : 'text-gray-500 hover:text-gray-700'}`}
                         >English</button>
                     </div>
@@ -387,7 +466,7 @@ const InputForm = ({ onUpdate, data }) => {
                         value={newSubject}
                         onChange={(e) => setNewSubject(e.target.value)}
                         placeholder="Subject Name (e.g. Mathematics)"
-                        className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 font-sinhala"
+                        className="flex-1 px-3 py-2 border border-blue-200 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 font-sinhala bg-white"
                         onKeyDown={(e) => e.key === 'Enter' && addSubject()}
                     />
                     <input
@@ -396,16 +475,18 @@ const InputForm = ({ onUpdate, data }) => {
                         max="50"
                         value={quantity}
                         onChange={(e) => setQuantity(e.target.value)}
-                        className="w-20 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        className="w-16 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-center"
+                        title="Quantity"
                     />
-                    <button
-                        onClick={addSubject}
-                        title="Add Subject"
-                        className="bg-blue-600 text-white p-2 rounded-md hover:bg-blue-700 transition-colors"
-                    >
-                        <Plus size={20} />
-                    </button>
                 </div>
+
+                <button
+                    onClick={addSubject}
+                    className="w-full bg-blue-600 text-white font-semibold p-3 rounded-lg hover:bg-blue-700 transition-colors flex items-center justify-center gap-2 shadow-sm"
+                >
+                    <Plus size={20} />
+                    Add Card to Batch
+                </button>
 
                 {/* Helper for blank cards */}
                 <div className="flex justify-end mb-2">
@@ -461,7 +542,14 @@ const InputForm = ({ onUpdate, data }) => {
                                 <button
                                     type="button"
                                     onClick={() => {
-                                        const updated = data.subjects.map(s => s.id === subj.id ? { ...s, language: 'sinhala' } : s);
+                                        const updated = data.subjects.map(s => s.id === subj.id ? {
+                                            ...s,
+                                            language: 'sinhala',
+                                            nameLanguage: 'sinhala',
+                                            gradeLanguage: 'sinhala',
+                                            schoolLanguage: 'sinhala',
+                                            familyLanguage: 'english' // User Request: Family name in English
+                                        } : s);
                                         onUpdate({ ...data, subjects: updated });
                                     }}
                                     className={`px-2 py-0.5 text-xs rounded transition-colors ${(subj.language || 'sinhala') === 'sinhala'
@@ -474,7 +562,14 @@ const InputForm = ({ onUpdate, data }) => {
                                 <button
                                     type="button"
                                     onClick={() => {
-                                        const updated = data.subjects.map(s => s.id === subj.id ? { ...s, language: 'english' } : s);
+                                        const updated = data.subjects.map(s => s.id === subj.id ? {
+                                            ...s,
+                                            language: 'english',
+                                            nameLanguage: 'english',
+                                            gradeLanguage: 'english',
+                                            schoolLanguage: 'english',
+                                            familyLanguage: 'english'
+                                        } : s);
                                         onUpdate({ ...data, subjects: updated });
                                     }}
                                     className={`px-2 py-0.5 text-xs rounded transition-colors ${subj.language === 'english'

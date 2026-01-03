@@ -27,7 +27,15 @@ function App() {
         gradeLanguage: 'sinhala',
         schoolLanguage: 'sinhala',
         textAlign: { subject: 'center', grade: 'center', school: 'center' },
-        autoScale: true
+        autoScale: true,
+        textStyles: {
+            name: { bold: false, italic: false },
+            family: { bold: false, italic: false },
+            grade: { bold: false, italic: false },
+            school: { bold: false, italic: false },
+            subject: { bold: false, italic: false },
+            phone: { bold: false, italic: false }
+        }
     });
     const [isGenerating, setIsGenerating] = useState(false);
     const printRef = useRef(null);
@@ -39,15 +47,14 @@ function App() {
 
         data.subjects.forEach(subj => {
             for (let i = 0; i < subj.count; i++) {
-                for (let i = 0; i < subj.count; i++) {
-                    cards.push({
-                        ...data,
-                        ...subj, // Apply snapshot details (studentName, grade, etc.)
-                        subject: subj.name, // Ensure subject name is correct
-                        language: subj.language || data.language || 'sinhala', // prefer subject snapshot lang, then global
-                        uniqueId: `${subj.id}-${i}`
-                    });
-                }
+                cards.push({
+                    ...data,
+                    ...subj, // Apply snapshot details (studentName, grade, etc.)
+                    subject: subj.name, // Ensure subject name is correct
+                    language: subj.language || data.language || 'sinhala', // prefer subject snapshot lang, then global
+                    textStyles: subj.textStyles || data.textStyles, // Snapshot styles or global
+                    uniqueId: `${subj.id}-${i}`
+                });
             }
         });
         return cards;
@@ -260,7 +267,7 @@ function App() {
                                         grade={data.grade}
                                         autoScale={data.autoScale}
                                         school={data.school}
-                                        subject={data.subjects.length > 0 ? data.subjects[0].name : ""}
+                                        subject={data.subjects.length > 0 ? data.subjects[data.subjects.length - 1].name : ""}
                                         image={data.image}
                                         phone={data.phone}
                                         language={data.language}
@@ -268,8 +275,14 @@ function App() {
                                         optimizeEnglish={data.optimizeEnglish}
                                         template={data.template}
                                         colorMode={data.colorMode}
-                                        subjectLanguage={data.subjects.length > 0 ? (data.subjects[0].language || 'sinhala') : 'sinhala'}
+                                        subjectLanguage={data.subjects.length > 0 ? (data.subjects[data.subjects.length - 1].language || 'sinhala') : 'sinhala'}
                                         textAlign={data.textAlign}
+                                        nameLanguage={data.nameLanguage}
+                                        gradeLanguage={data.gradeLanguage}
+                                        schoolLanguage={data.schoolLanguage}
+                                        // familyLanguage is already passed above
+                                        // Pass text styles
+                                        textStyles={data.textStyles}
                                         scale={1.2}
                                     />
                                 </div>
@@ -285,7 +298,7 @@ function App() {
             </div>
 
             {/* Hidden Print Area - This is what gets captured */}
-            <div className="fixed top-0 left-0 -z-50 opacity-0 pointer-events-none" style={{ width: '210mm' }}>
+            <div className="fixed" style={{ left: '-10000px', top: 0, width: '210mm' }}>
                 <div ref={printRef}>
                     {pages.map((pageCards, pageIndex) => (
                         <div
@@ -316,6 +329,10 @@ function App() {
                                         colorMode={card.colorMode}
                                         subjectLanguage={card.language || 'sinhala'}
                                         textAlign={card.textAlign}
+                                        nameLanguage={card.nameLanguage}
+                                        gradeLanguage={card.gradeLanguage}
+                                        schoolLanguage={card.schoolLanguage}
+                                        textStyles={card.textStyles}
                                         scale={1.0} // exact size for print
                                     />
                                 </div>
