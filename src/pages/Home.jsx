@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { PenTool, ArrowRight, Printer, Star } from 'lucide-react';
+import { PenTool, ArrowRight, Printer, Star, Download } from 'lucide-react';
 
 const Home = () => {
     return (
