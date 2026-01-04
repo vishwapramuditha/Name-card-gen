@@ -416,7 +416,7 @@ const CardPreview = ({
 
                     {/* Right: Image */}
                     <div className="w-[30%] flex-shrink-0 flex items-end justify-center relative -mr-2 -mb-2">
-                        {image && <img src={image} className="object-contain max-h-[95%] w-full mb-1" />}
+                        {image && <img src={image} className="object-cover max-h-[95%] max-w-full mb-1" />}
                     </div>
                 </div>
             </div>
@@ -507,7 +507,7 @@ const CardPreview = ({
                             <div className="relative w-full h-full flex items-end justify-center">
                                 <img
                                     src={image}
-                                    className="object-contain max-h-[90%] max-w-[140%] transform translate-x-2"
+                                    className="object-cover max-h-[90%] max-w-full transform translate-x-2"
                                     style={{
                                         maskImage: 'linear-gradient(to top, black 80%, transparent 100%)',
                                         WebkitMaskImage: 'linear-gradient(to top, black 80%, transparent 100%)'
@@ -630,7 +630,7 @@ const CardPreview = ({
                             </div>
                         </div>
                         <div className="w-[35%] h-full flex items-center justify-center">
-                            {image ? <img src={image} className="w-full h-full object-contain" /> : null}
+                            {image ? <img src={image} className="h-full object-cover" /> : null}
                         </div>
                     </div>
 
