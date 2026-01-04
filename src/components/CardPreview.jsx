@@ -416,7 +416,7 @@ const CardPreview = ({
 
                     {/* Right: Image */}
                     <div className="w-[30%] flex-shrink-0 flex items-end justify-center relative -mr-2 -mb-2">
-                        {image && <img src={image} className="object-cover min-w-full min-h-full mb-1" style={{ objectPosition: 'center 20%' }} />}
+                        {image && <img src={image} className="w-full h-full object-cover mb-1" style={{ objectPosition: 'center 35%' }} />}
                     </div>
                 </div>
             </div>
@@ -507,11 +507,11 @@ const CardPreview = ({
                             <div className="relative w-full h-full flex items-end justify-center">
                                 <img
                                     src={image}
-                                    className="object-cover min-w-full min-h-full transform translate-x-2"
+                                    className="w-full h-full object-cover transform translate-x-2"
                                     style={{
                                         maskImage: 'linear-gradient(to top, black 80%, transparent 100%)',
                                         WebkitMaskImage: 'linear-gradient(to top, black 80%, transparent 100%)',
-                                        objectPosition: 'center 20%'
+                                        objectPosition: 'center 35%'
                                     }}
                                 />
                             </div>
@@ -631,7 +631,7 @@ const CardPreview = ({
                             </div>
                         </div>
                         <div className="w-[35%] h-full flex items-center justify-center">
-                            {image ? <img src={image} className="min-h-full object-cover" style={{ objectPosition: 'center 20%' }} /> : null}
+                            {image ? <img src={image} className="w-full h-full object-cover" style={{ objectPosition: 'center 35%' }} /> : null}
                         </div>
                     </div>
 
@@ -689,7 +689,7 @@ const CardPreview = ({
                 </div>
 
                 <div className="w-[100px] bg-gray-50 flex items-center justify-center p-1 overflow-hidden relative" style={{ backgroundColor: isBw ? '#f9f9f9' : theme.bg }}>
-                    {image && <img src={image} className="min-w-full min-h-full object-cover" style={{ objectPosition: 'center 20%' }} />}
+                    {image && <img src={image} className="w-full h-full object-cover" style={{ objectPosition: 'center 35%' }} />}
                 </div>
             </div>
         </div>
