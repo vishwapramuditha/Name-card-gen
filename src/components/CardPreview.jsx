@@ -416,7 +416,7 @@ const CardPreview = ({
 
                     {/* Right: Image */}
                     <div className="w-[30%] flex-shrink-0 flex items-end justify-center relative -mr-2 -mb-2">
-                        {image && <img src={image} className="object-cover max-h-[95%] max-w-full mb-1" />}
+                        {image && <img src={image} className="object-cover max-h-[95%] max-w-full mb-1" style={{ objectPosition: 'top center' }} />}
                     </div>
                 </div>
             </div>
@@ -510,7 +510,8 @@ const CardPreview = ({
                                     className="object-cover max-h-[90%] max-w-full transform translate-x-2"
                                     style={{
                                         maskImage: 'linear-gradient(to top, black 80%, transparent 100%)',
-                                        WebkitMaskImage: 'linear-gradient(to top, black 80%, transparent 100%)'
+                                        WebkitMaskImage: 'linear-gradient(to top, black 80%, transparent 100%)',
+                                        objectPosition: 'top center'
                                     }}
                                 />
                             </div>
@@ -630,7 +631,7 @@ const CardPreview = ({
                             </div>
                         </div>
                         <div className="w-[35%] h-full flex items-center justify-center">
-                            {image ? <img src={image} className="h-full object-cover" /> : null}
+                            {image ? <img src={image} className="h-full object-cover" style={{ objectPosition: 'top center' }} /> : null}
                         </div>
                     </div>
 
@@ -688,7 +689,7 @@ const CardPreview = ({
                 </div>
 
                 <div className="w-[100px] bg-gray-50 flex items-center justify-center p-1 overflow-hidden relative" style={{ backgroundColor: isBw ? '#f9f9f9' : theme.bg }}>
-                    {image && <img src={image} className="w-full h-full object-contain" />}
+                    {image && <img src={image} className="w-full h-full object-cover" style={{ objectPosition: 'top center' }} />}
                 </div>
             </div>
         </div>
