@@ -239,7 +239,7 @@ const CardPreview = ({
         return (
             <div className="w-full text-center px-1 leading-tight pb-0">
                 {familyName && <div className="leading-none mb-0.5" style={{
-                    fontSize: familySizeVal, color: familyColor, marginTop: '2px',
+                    fontSize: familySizeVal, color: familyColor,
                     fontWeight: safeTextStyles.family?.bold ? 'bold' : 'normal',
                     fontStyle: safeTextStyles.family?.italic ? 'italic' : 'normal'
                 }}>
@@ -398,7 +398,7 @@ const CardPreview = ({
                 <div className="absolute inset-0 border-2 border-black pointer-events-none" style={{ margin: `${4 * scale}px` }}></div>
 
                 <div className="flex w-full h-full relative z-10">
-                    <div className="flex-1 flex flex-col items-center justify-center py-[1%] z-20 overflow-hidden px-1" style={{ gap: `${4 * scale}px` }}>
+                    <div className="flex-1 flex flex-col items-center justify-center py-2 z-20 overflow-hidden px-1" style={{ gap: `${4 * scale}px` }}>
                         {/* Top: Name Block */}
                         {renderNameBlock('black')}
 
@@ -416,7 +416,7 @@ const CardPreview = ({
 
                     {/* Right: Image */}
                     <div className="w-[30%] flex-shrink-0 flex items-end justify-center relative -mr-2 -mb-2">
-                        {image && <img src={image} className="object-cover max-h-[95%] max-w-full mb-1" style={{ objectPosition: 'top center' }} />}
+                        {image && <img src={image} className="object-cover min-w-full min-h-full mb-1" style={{ objectPosition: 'center 20%' }} />}
                     </div>
                 </div>
             </div>
@@ -507,11 +507,11 @@ const CardPreview = ({
                             <div className="relative w-full h-full flex items-end justify-center">
                                 <img
                                     src={image}
-                                    className="object-cover max-h-[90%] max-w-full transform translate-x-2"
+                                    className="object-cover min-w-full min-h-full transform translate-x-2"
                                     style={{
                                         maskImage: 'linear-gradient(to top, black 80%, transparent 100%)',
                                         WebkitMaskImage: 'linear-gradient(to top, black 80%, transparent 100%)',
-                                        objectPosition: 'top center'
+                                        objectPosition: 'center 20%'
                                     }}
                                 />
                             </div>
@@ -631,7 +631,7 @@ const CardPreview = ({
                             </div>
                         </div>
                         <div className="w-[35%] h-full flex items-center justify-center">
-                            {image ? <img src={image} className="h-full object-cover" style={{ objectPosition: 'top center' }} /> : null}
+                            {image ? <img src={image} className="min-h-full object-cover" style={{ objectPosition: 'center 20%' }} /> : null}
                         </div>
                     </div>
 
@@ -689,7 +689,7 @@ const CardPreview = ({
                 </div>
 
                 <div className="w-[100px] bg-gray-50 flex items-center justify-center p-1 overflow-hidden relative" style={{ backgroundColor: isBw ? '#f9f9f9' : theme.bg }}>
-                    {image && <img src={image} className="w-full h-full object-cover" style={{ objectPosition: 'top center' }} />}
+                    {image && <img src={image} className="min-w-full min-h-full object-cover" style={{ objectPosition: 'center 20%' }} />}
                 </div>
             </div>
         </div>
